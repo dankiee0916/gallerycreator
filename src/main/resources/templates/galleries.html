@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/fragments :: head"></head>
+<body>
+    <!-- Background image (goes behind everything) -->
+    <div class="background-image"></div>
+
+    <!-- Dark overlay -->
+    <div class="bg-overlay">
+        <div th:replace="fragments/fragments :: navbar"></div>
+
+        <div class="container text-light mt-5 pt-5">
+            <h2 class="text-center mb-4">All Galleries</h2>
+
+            <div class="row justify-content-center" th:if="${galleries != null}">
+                <div class="col-md-8 mb-4" th:each="gallery : ${galleries}">
+                    <div class="card bg-dark text-white h-100">
+                        <div class="card-body">
+                            <h5 class="card-title" th:text="${gallery.title}">Title</h5>
+                            <p class="card-text" th:text="${gallery.description}">Description</p>
+                            <a th:href="@{'/galleries/' + ${gallery.id}}" class="btn btn-outline-light btn-sm">View Gallery</a>
+                            <a th:href="@{'/galleries/edit/' + ${gallery.id}}" class="btn btn-outline-light btn-sm">Edit</a>
+                            <a th:href="@{'/galleries/delete/' + ${gallery.id}}" class="btn btn-outline-light btn-sm">Delete</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div th:if="${galleries == null or #lists.isEmpty(galleries)}" class="text-center">
+                <p>No galleries found.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

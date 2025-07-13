@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/fragments :: head"></head>
+<body>
+    <div class="bg-overlay">
+        <div th:replace="fragments/fragments :: navbar"></div>
+
+        <div class="container text-light mt-5 pt-5" style="max-width: 400px;">
+            <h2 class="text-center mb-4">Login</h2>
+
+            <form th:action="@{/login}" method="post">
+                <div class="mb-3">
+                    <label for="username" class="form-label">Username</label>
+                    <input type="text" id="username" name="username" class="form-control" required />
+                </div>
+
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" id="password" name="password" class="form-control" required />
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-outline-light">Login</button>
+                </div>
+            </form>
+
+            <p class="text-center mt-3">
+                Don't have an account? <a href="/register" class="text-light text-decoration-underline">Register here</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/fragments :: head"></head>
+<body>
+    <div class="bg-overlay">
+        <div th:replace="fragments/navbar :: navbar"></div>
+
+        <div class="container text-light mt-5" style="max-width: 600px;">
+            <h2 class="text-center mb-4">Edit Photo</h2>
+
+            <form th:action="@{/photos/edit}" method="post" enctype="multipart/form-data" th:object="${photo}">
+                <input type="hidden" th:field="*{id}" />
+                <input type="hidden" name="galleryId" th:value="${galleryId}" />
+
+                <div class="mb-3">
+                    <label for="caption" class="form-label">Caption</label>
+                    <input type="text" class="form-control" th:field="*{caption}" id="caption" required />
+                </div>
+
+                <div class="mb-3">
+                    <label for="file" class="form-label">Replace Image (optional)</label>
+                    <input type="file" class="form-control" name="file" id="file" />
+                </div>
+
+                <button type="submit" class="btn btn-outline-light">Update Photo</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

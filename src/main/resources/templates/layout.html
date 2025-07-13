@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/fragments :: head"></head>
+<body>
+    <div class="overlay">
+        <header>
+            <nav>
+                <ul style="list-style: none; display: flex; gap: 15px; padding: 10px;">
+                    <li><a th:href="@{/}">Home</a></li>
+                    <li><a th:href="@{/login}">Login</a></li>
+                    <li><a th:href="@{/register}">Register</a></li>
+                    <li><a th:href="@{/galleries}">My Galleries</a></li>
+                    <li><a th:href="@{/gallery/create}">Create Gallery</a></li>
+                    <li><a th:href="@{/upload}">Upload Photo</a></li>
+                    <li><a th:href="@{/logout}">Logout</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <main>
+            <div th:insert="~{::body}"></div>
+        </main>
+    </div>
+</body>
+</html>

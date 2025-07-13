@@ -1,0 +1,53 @@
+/* Separate background layer */
+.background-image {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('/images/background.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: -2;
+}
+
+/* Dark overlay above background */
+.background-image::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* adjust darkness here */
+    z-index: -1;
+    pointer-events: none; /* Let clicks pass through */
+}
+
+/* Container for page content */
+.bg-overlay {
+    position: relative;
+    z-index: 1;
+}
+
+/* Text + button colors */
+.container.text-light h1,
+.container.text-light h2,
+.container.text-light p,
+.container.text-light label {
+    color: #fff;
+}
+
+.container.text-light a.btn,
+.btn-outline-light {
+    border: 1px solid #fff;
+    color: #fff;
+    background-color: transparent;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.container.text-light a.btn:hover,
+.btn-outline-light:hover {
+    background-color: #fff;
+    color: #000;
+}
