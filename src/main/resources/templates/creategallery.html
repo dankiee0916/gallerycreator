@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:replace="fragments/fragments :: head"></head>
 <body>
 
@@ -9,7 +10,7 @@
     <!-- Foreground content -->
     <div class="bg-overlay">
 
-        <div th:replace="fragments/fragments :: navbar"></div>
+        <div th:replace="fragments/navbar :: navbar"></div>
 
         <div class="container text-light mt-5">
             <h2 class="text-center mb-4">Create a New Gallery</h2>

@@ -1,9 +1,14 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:replace="fragments/fragments :: head"></head>
 <body>
+
+    <!-- Background image + dark overlay -->
+    <div class="background-image"></div>
+
     <div class="bg-overlay">
-        <div th:replace="fragments/fragments :: navbar"></div>
+        <div th:replace="fragments/navbar :: navbar"></div>
 
         <div class="container text-light mt-5 pt-5">
             <h2 class="text-center mb-3" th:text="${gallery.title}">Gallery Title</h2>
@@ -14,22 +19,28 @@
                 <a th:href="@{'/photos/upload/' + ${gallery.id}}" class="btn btn-info">Add Photo</a>
             </div>
 
+            <!-- Photo Grid -->
             <div class="row" th:if="${gallery.photos != null}">
-    <div class="col-md-4 mb-4" th:each="photo : ${gallery.photos}">
-        <div class="card bg-dark text-white">
-            <img th:src="${photo.url}" class="card-img-top" alt="Photo">
-            <div class="card-body">
-                <p class="card-text" th:text="${photo.caption}">Caption goes here</p>
+                <div class="col-md-4 mb-4" th:each="photo : ${gallery.photos}">
+                    <div class="card bg-dark text-white">
 
-                <!-- Add these buttons inside the photo card, only if user owns the gallery -->
-                <div th:if="${ownsGallery}">
-                    <a th:href="@{'/photos/edit/' + ${photo.id}}" class="btn btn-warning btn-sm me-2">Edit</a>
-                    <a th:href="@{'/photos/delete/' + ${photo.id}}" class="btn btn-danger btn-sm">Delete</a>
+                        <!-- Wrap image in link to view photo -->
+                        <a th:href="@{'/photos/view/' + ${photo.id}}">
+                            <img th:src="${photo.url}" class="card-img-top" alt="Photo" style="cursor: pointer;">
+                        </a>
+
+                        <div class="card-body">
+                            <p class="card-text" th:text="${photo.caption}">Caption goes here</p>
+
+                            <!-- Show edit/delete buttons only if user owns gallery -->
+                            <div th:if="${ownsGallery}">
+                                <a th:href="@{'/photos/edit/' + ${photo.id}}" class="btn btn-warning btn-sm me-2">Edit</a>
+                                <a th:href="@{'/photos/delete/' + ${photo.id}}" class="btn btn-danger btn-sm">Delete</a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
-</div>
 
             <div th:if="${gallery.photos == null or #lists.isEmpty(gallery.photos)}" class="text-center">
                 <p>No photos have been added to this gallery yet.</p>

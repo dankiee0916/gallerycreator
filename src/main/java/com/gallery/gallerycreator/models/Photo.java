@@ -15,14 +15,13 @@ public class Photo {
     private int id;
 
     private String caption;
-
-    private String url; // ✅ Needed for storing the file path
+    private String url;
 
     @ManyToOne
     @JoinColumn(name = "gallery_id")
     private Gallery gallery;
 
-    // --- Getters and setters ---
+    // Getters and setters
     public int getId() {
         return id;
     }

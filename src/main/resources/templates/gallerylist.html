@@ -2,29 +2,45 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="fragments/fragments :: head"></head>
 <body>
-    <div class="bg-overlay">
-        <div th:replace="fragments/fragments :: navbar"></div>
 
-        <div class="container text-light mt-5 pt-5">
-            <h2 class="text-center mb-4">Your Galleries</h2>
-            <div class="text-center mb-4">
-                <a href="/galleries/create" class="btn btn-outline-light">Create New Gallery</a>
+    <!-- Background image + dark overlay -->
+    <div class="background-image"></div>
+    <div class="bg-overlay">
+
+        <!-- Navbar fragment -->
+        <div th:replace="fragments/navbar :: navbar"></div>
+
+        <!-- Main content -->
+        <div class="container mt-5 text-light">
+            <h2 class="mb-4 text-center" th:text="${isMyGallery} ? 'My Galleries' : 'All Galleries'">Gallery List</h2>
+
+            <!-- Create button only for user's own galleries -->
+            <div class="text-center mb-4" th:if="${isMyGallery}">
+                <a class="btn btn-outline-light" href="/galleries/create">+ Create New Gallery</a>
             </div>
 
-            <div class="row" th:each="gallery : ${galleries}">
-                <div class="col-md-4 mb-4">
-                    <div class="card bg-dark text-white h-100">
-                        <div class="card-body">
-                            <h5 class="card-title" th:text="${gallery.title}">Title</h5>
-                            <p class="card-text" th:text="${gallery.description}">Description</p>
-                            <a th:href="@{'/galleries/' + ${gallery.id}}" class="btn btn-outline-light me-2">View</a>
-                            <a th:href="@{'/galleries/edit/' + ${gallery.id}}" class="btn btn-warning me-2">Edit</a>
-                            <a th:href="@{'/galleries/delete/' + ${gallery.id}}" class="btn btn-danger">Delete</a>
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="list-group">
+                        <!-- If no galleries -->
+                        <div th:if="${#lists.isEmpty(galleries)}" class="text-center">
+                            <p th:text="${isMyGallery} ? 'You haven\'t created any galleries yet.' : 'No galleries have been created yet.'"></p>
                         </div>
+
+                        <!-- Gallery list -->
+                        <a th:each="gallery : ${galleries}"
+                           th:href="@{'/galleries/' + ${gallery.id}}"
+                           class="list-group-item list-group-item-action bg-dark text-light border-light mb-2">
+                            <div>
+                                <h5 th:text="${gallery.title}">Gallery Title</h5>
+                                <small th:text="'Created by: ' + ${gallery.user.username}">Created by: user123</small>
+                            </div>
+                        </a>
                     </div>
                 </div>
             </div>
         </div>
+
     </div>
 </body>
 </html>

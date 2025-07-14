@@ -2,52 +2,27 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="fragments/fragments :: head"></head>
 <body>
+    <div class="background-image"></div>
     <div class="bg-overlay">
-        <div th:replace="fragments/fragments :: navbar"></div>
+        <div th:replace="fragments/navbar :: navbar"></div>
 
-        <div class="container text-light mt-5" style="max-width: 600px;">
+        <div class="container mt-5 text-light">
             <h2 class="text-center mb-4">Edit Gallery</h2>
-
-            <form th:action="@{/galleries/update}" method="post" th:object="${gallery}">
-                <!-- Hidden field to keep the gallery ID -->
+            <form th:action="@{/galleries/edit}" th:object="${gallery}" method="post">
                 <input type="hidden" th:field="*{id}" />
 
                 <div class="mb-3">
-                    <label for="title" class="form-label">Gallery Title</label>
-                    <input type="text" th:field="*{title}" class="form-control" id="title" required>
+                    <label class="form-label">Title</label>
+                    <input type="text" th:field="*{title}" class="form-control" />
                 </div>
 
                 <div class="mb-3">
-                    <label for="description" class="form-label">Description</label>
-                    <textarea th:field="*{description}" class="form-control" id="description" rows="4" required></textarea>
+                    <label class="form-label">Description</label>
+                    <textarea th:field="*{description}" class="form-control"></textarea>
                 </div>
 
-                <div class="d-grid gap-2">
-                    <button type="submit" class="btn btn-outline-light">Save Changes</button>
-                </div>
+                <button type="submit" class="btn btn-outline-light">Update Gallery</button>
             </form>
-        </div>
-
-        <!-- Display Photos with Edit/Delete Buttons -->
-        <div class="container text-light mt-5">
-            <h3 class="text-center mb-4">Photos in this Gallery</h3>
-
-            <div class="row" th:if="${gallery.photos != null}">
-                <div class="col-md-4 mb-4" th:each="photo : ${gallery.photos}">
-                    <div class="card bg-dark text-white">
-                        <img th:src="${photo.url}" class="card-img-top" alt="Photo">
-                        <div class="card-body">
-                            <p class="card-text" th:text="${photo.caption}">Caption</p>
-                            <a th:href="@{'/photos/edit/' + ${photo.id}}" class="btn btn-warning btn-sm me-2">Edit</a>
-                            <a th:href="@{'/photos/delete/' + ${photo.id}}" class="btn btn-danger btn-sm">Delete</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div th:if="${gallery.photos == null or #lists.isEmpty(gallery.photos)}" class="text-center">
-                <p>No photos in this gallery yet.</p>
-            </div>
         </div>
     </div>
 </body>

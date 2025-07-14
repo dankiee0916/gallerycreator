@@ -35,7 +35,7 @@ public class PhotoController {
     public String showUploadForm(@PathVariable int galleryId, Model model) {
         model.addAttribute("photo", new Photo());
         model.addAttribute("galleryId", galleryId);
-        return "upload-photo";
+        return "uploadphoto";
     }
 
     @PostMapping("/upload")
@@ -49,12 +49,13 @@ public class PhotoController {
             Gallery gallery = optionalGallery.get();
             if (gallery.getUser().getUsername().equals(principal.getName())) {
                 if (!file.isEmpty()) {
-                    String uploadDir = "src/main/resources/static/uploads/";
-                    String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-                    File destinationFile = new File(uploadDir + fileName);
-                    destinationFile.getParentFile().mkdirs();
-                    file.transferTo(destinationFile);
+                    String uploadDir = System.getProperty("user.dir") + File.separator + "uploads";
+                    File uploadPath = new File(uploadDir);
+                    if (!uploadPath.exists()) uploadPath.mkdirs();
 
+                    String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+                    File destinationFile = new File(uploadPath, fileName);
+                    file.transferTo(destinationFile);
                     photo.setUrl("/uploads/" + fileName);
                 }
 
@@ -74,7 +75,7 @@ public class PhotoController {
             if (photo.getGallery().getUser().getUsername().equals(principal.getName())) {
                 model.addAttribute("photo", photo);
                 model.addAttribute("galleryId", photo.getGallery().getId());
-                return "edit-photo";
+                return "editphoto";
             }
         }
         return "redirect:/galleries";
@@ -91,10 +92,12 @@ public class PhotoController {
             Gallery gallery = optionalGallery.get();
             if (gallery.getUser().getUsername().equals(principal.getName())) {
                 if (!file.isEmpty()) {
-                    String uploadDir = "src/main/resources/static/uploads/";
+                    String uploadDir = System.getProperty("user.dir") + File.separator + "uploads";
+                    File uploadPath = new File(uploadDir);
+                    if (!uploadPath.exists()) uploadPath.mkdirs();
+
                     String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-                    File destinationFile = new File(uploadDir + fileName);
-                    destinationFile.getParentFile().mkdirs();
+                    File destinationFile = new File(uploadPath, fileName);
                     file.transferTo(destinationFile);
                     photo.setUrl("/uploads/" + fileName);
                 }
@@ -116,6 +119,16 @@ public class PhotoController {
                 photoService.deletePhoto(photoId);
                 return "redirect:/galleries/" + galleryId;
             }
+        }
+        return "redirect:/galleries";
+    }
+
+    @GetMapping("/view/{photoId}")
+    public String viewPhoto(@PathVariable int photoId, Model model) {
+        Optional<Photo> optionalPhoto = photoService.getPhotoById(photoId);
+        if (optionalPhoto.isPresent()) {
+            model.addAttribute("photo", optionalPhoto.get());
+            return "viewphoto";
         }
         return "redirect:/galleries";
     }

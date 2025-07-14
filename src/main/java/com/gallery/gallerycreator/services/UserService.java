@@ -25,4 +25,11 @@ public class UserService {
     public User getUserByUsername(String username) {
         return userRepo.findByUsername(username);
     }
+
+    // Checks the password of user
+    public boolean checkPassword(String rawPassword, String encodedPassword) {
+    return passwordEncoder.matches(rawPassword, encodedPassword);
+}
+
+
 }

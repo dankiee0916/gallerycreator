@@ -2,31 +2,28 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="fragments/fragments :: head"></head>
 <body>
+    <div class="background-image"></div>
     <div class="bg-overlay">
-        <div th:replace="fragments/fragments :: navbar"></div>
+        <div th:replace="fragments/navbar :: navbar"></div>
 
-        <div class="container text-light mt-5" style="max-width: 600px;">
+        <div class="container mt-5 text-light">
             <h2 class="text-center mb-4">Upload a Photo</h2>
-
-            <form th:action="@{/photos/upload}" method="post" enctype="multipart/form-data" th:object="${photo}">
-                <input type="hidden" th:name="galleryId" th:value="${galleryId}" />
-
-                <div class="mb-3">
-                    <label for="caption" class="form-label">Caption</label>
-                    <input type="text" th:field="*{caption}" class="form-control" id="caption" required>
-                </div>
+            <form th:action="@{/photos/upload}" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="galleryId" th:value="${galleryId}" />
 
                 <div class="mb-3">
-                    <label for="file" class="form-label">Choose Photo</label>
-                    <input type="file" class="form-control" name="file" required />
+                    <label for="title" class="form-label">Title</label>
+                    <input type="text" id="title" name="title" class="form-control" required />
                 </div>
 
-                <div class="d-grid">
-                    <button type="submit" class="btn btn-outline-light">Upload Photo</button>
+                <div class="mb-3">
+                    <label for="file" class="form-label">Image File</label>
+                    <input type="file" id="file" name="file" class="form-control" required />
                 </div>
+
+                <button type="submit" class="btn btn-outline-light">Upload</button>
             </form>
         </div>
     </div>
 </body>
-
 </html>

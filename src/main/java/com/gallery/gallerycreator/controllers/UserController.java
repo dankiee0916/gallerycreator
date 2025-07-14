@@ -6,9 +6,12 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.gallery.gallerycreator.models.User;
 import com.gallery.gallerycreator.services.UserService;
+
+import jakarta.servlet.http.HttpSession;
 
 @Controller
 public class UserController {
@@ -16,32 +19,51 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    // Show the registration form
+    // Show registration form
     @GetMapping("/register")
-    public String showRegisterForm(Model model) {
-        model.addAttribute("user", new User());  // bind empty User object
-        return "register";  // maps to register.html
+    public String showRegisterForm(HttpSession session, Model model) {
+        model.addAttribute("user", new User());
+        model.addAttribute("session", session);
+        return "register";
     }
 
-    // Handle form submission
+    // Handle registration
     @PostMapping("/register")
-    public String processRegister(@ModelAttribute("user") User user) {
-        // Optional: log for debug
-        System.out.println("Registering user: " + user.getUsername());
-
-        userService.saveUser(user);  // save user (with password hashing)
-        return "redirect:/login";   // go to login page after success
+    public String registerUser(@ModelAttribute User user) {
+        userService.saveUser(user); // saves the hashed user
+        return "redirect:/login";
     }
 
-    // Show the login form
+    // Show login form
     @GetMapping("/login")
-    public String showLoginForm() {
-        return "login";  // maps to login.html
+    public String showLoginForm(HttpSession session, Model model) {
+        model.addAttribute("session", session);
+        return "login";
     }
 
-    // Optional: Handle logout redirect (Spring Security usually auto-handles this)
+    // Handle login logic
+    @PostMapping("/login")
+    public String login(@RequestParam String username,
+                        @RequestParam String password,
+                        HttpSession session,
+                        Model model) {
+
+        User user = userService.getUserByUsername(username);
+
+        if (user != null && userService.checkPassword(password, user.getPassword())) {
+            session.setAttribute("loggedInUser", user);
+            return "redirect:/galleries"; // or wherever you want to go after login
+        } else {
+            model.addAttribute("error", "Invalid username or password.");
+            model.addAttribute("session", session);
+            return "login";
+        }
+    }
+
+    // Handle logout
     @GetMapping("/logout")
-    public String logout() {
+    public String logout(HttpSession session) {
+        session.invalidate();
         return "redirect:/login";
     }
 }

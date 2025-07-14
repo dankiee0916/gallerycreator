@@ -1,7 +1,12 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:replace="fragments/fragments :: head"></head>
 <body>
+
+    <!-- Background image + dark overlay -->
+    <div class="background-image"></div>
+
     <div class="bg-overlay">
         <div th:replace="fragments/navbar :: navbar"></div>
 
@@ -12,6 +17,12 @@
                 <input type="hidden" th:field="*{id}" />
                 <input type="hidden" name="galleryId" th:value="${galleryId}" />
 
+                <!-- Current Image Preview -->
+                <div class="mb-4 text-center">
+                    <h5>Current Image</h5>
+                    <img th:src="@{${photo.url}}" alt="Current Photo" class="img-fluid rounded shadow" style="max-height: 300px;" />
+                </div>
+
                 <div class="mb-3">
                     <label for="caption" class="form-label">Caption</label>
                     <input type="text" class="form-control" th:field="*{caption}" id="caption" required />
@@ -19,7 +30,7 @@
 
                 <div class="mb-3">
                     <label for="file" class="form-label">Replace Image (optional)</label>
-                    <input type="file" class="form-control" name="file" id="file" />
+                    <input type="file" class="form-control" name="file" id="file" accept="image/*" />
                 </div>
 
                 <button type="submit" class="btn btn-outline-light">Update Photo</button>

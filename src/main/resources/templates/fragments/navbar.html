@@ -1,33 +1,36 @@
 <nav th:fragment="navbar" class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="/">Gallery Creator</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div class="collapse navbar-collapse" id="navbarContent">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item"><a class="nav-link" th:href="@{/galleries}">Galleries</a></li>
-                <li class="nav-item"><a class="nav-link" th:href="@{/galleries/create}">Create Gallery</a></li>
-                <li class="nav-item"><a class="nav-link" th:href="@{/photo/upload}">Upload Photo</a></li>
-                <li class="nav-item"><a class="nav-link" th:href="@{/comments}">Comments</a></li>
-            </ul>
-
+        <div class="collapse navbar-collapse">
             <ul class="navbar-nav ms-auto">
-                <li class="nav-item" sec:authorize="isAuthenticated()">
-                    <a class="nav-link disabled">Signed in as <span sec:authentication="name"></span></a>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/}">Home</a>
                 </li>
-                <li class="nav-item" sec:authorize="isAuthenticated()">
-                    <form th:action="@{/logout}" method="post">
-                        <button class="btn btn-outline-light btn-sm" type="submit">Logout</button>
-                    </form>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/galleries}">My Gallery</a>
                 </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/galleries/all}">All Galleries</a>
+                </li>
+
+                <!-- Show only if NOT logged in -->
                 <li class="nav-item" sec:authorize="!isAuthenticated()">
                     <a class="nav-link" th:href="@{/login}">Login</a>
                 </li>
                 <li class="nav-item" sec:authorize="!isAuthenticated()">
                     <a class="nav-link" th:href="@{/register}">Register</a>
                 </li>
+
+                <!-- Show only if logged in -->
+                <li class="nav-item" sec:authorize="isAuthenticated()">
+                    <span class="nav-link">Welcome, <span sec:authentication="name"></span></span>
+                </li>
+                <li class="nav-item" sec:authorize="isAuthenticated()">
+                    <a class="nav-link text-danger" th:href="@{/logout}">Logout</a>
+                </li>
+
+
             </ul>
         </div>
     </div>

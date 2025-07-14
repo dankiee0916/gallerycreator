@@ -2,19 +2,20 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="fragments/fragments :: head"></head>
 <body>
-    <div class="bg-overlay">
 
-        <!-- Fix this line to point to the correct fragment -->
-        <div th:replace="fragments/fragments :: navbar"></div>
+    <!-- Background image + dark overlay -->
+    <div class="background-image"></div>
+
+    <div class="bg-overlay">
+        <div th:replace="fragments/navbar :: navbar"></div>
 
         <div class="container text-center text-light mt-5 pt-5">
             <h1>Welcome to The Gallery Creator!</h1>
             <p>Create, edit, and share your photo galleries with the world.</p>
-            <a href="/galleries" class="btn btn-outline-light m-2">View Galleries</a>
-            <a href="/login" class="btn btn-outline-light m-2">Login</a>
-            <a href="/register" class="btn btn-outline-light m-2">Register</a>
+            <a href="/galleries" class="btn btn-outline-light m-2">View Your Galleries</a>
+            <a href="/login" class="btn btn-outline-light m-2">View All Galleries</a>
         </div>
-
     </div>
+
 </body>
 </html>

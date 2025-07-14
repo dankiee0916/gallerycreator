@@ -1,6 +1,7 @@
 package com.gallery.gallerycreator.controllers;
 
 import java.security.Principal;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.gallery.gallerycreator.models.Gallery;
 import com.gallery.gallerycreator.models.User;
+import com.gallery.gallerycreator.repos.GalleryRepository;
 import com.gallery.gallerycreator.services.GalleryService;
 import com.gallery.gallerycreator.services.UserService;
 
@@ -27,22 +29,27 @@ public class GalleryController {
     @Autowired
     private UserService userService;
 
-    // Display user's galleries
+    @Autowired
+    private GalleryRepository galleryRepository;
+
+    // Display galleries that belong to the logged-in user
     @GetMapping
     public String listGalleries(Model model, Principal principal) {
         User user = userService.getUserByUsername(principal.getName());
-        model.addAttribute("galleries", galleryService.getGalleriesByUser(user));
+        List<Gallery> userGalleries = galleryService.getGalleriesByUser(user);
+        model.addAttribute("galleries", userGalleries);
+        model.addAttribute("isMyGallery", true);
         return "gallerylist";
     }
 
-    // Show form to create new gallery
+    // Show form to create a new gallery
     @GetMapping("/create")
     public String showCreateForm(Model model) {
         model.addAttribute("gallery", new Gallery());
         return "creategallery";
     }
 
-    // Save new gallery to DB
+    // Handle form submission to save a new gallery
     @PostMapping("/create")
     public String createGallery(@ModelAttribute Gallery gallery, Principal principal) {
         User user = userService.getUserByUsername(principal.getName());
@@ -51,19 +58,19 @@ public class GalleryController {
         return "redirect:/galleries";
     }
 
-    // Show edit form (only if owner)
+    // Show edit form (only if the logged-in user owns the gallery)
     @GetMapping("/edit/{id}")
     public String editGallery(@PathVariable int id, Model model, Principal principal) {
         Optional<Gallery> optionalGallery = galleryService.getGalleryById(id);
-        if (optionalGallery.isPresent()
-                && optionalGallery.get().getUser().getUsername().equals(principal.getName())) {
+        if (optionalGallery.isPresent() &&
+            optionalGallery.get().getUser().getUsername().equals(principal.getName())) {
             model.addAttribute("gallery", optionalGallery.get());
-            return "edit-gallery";
+            return "editgallery";
         }
         return "redirect:/galleries";
     }
 
-    // Save gallery edits
+    // Save gallery updates (only if the user owns it)
     @PostMapping("/edit")
     public String updateGallery(@ModelAttribute Gallery gallery, Principal principal) {
         if (gallery.getUser().getUsername().equals(principal.getName())) {
@@ -72,18 +79,18 @@ public class GalleryController {
         return "redirect:/galleries";
     }
 
-    // Delete gallery (only if owner)
+    // Delete a gallery (only if the logged-in user owns it)
     @GetMapping("/delete/{id}")
     public String deleteGallery(@PathVariable int id, Principal principal) {
         Optional<Gallery> optionalGallery = galleryService.getGalleryById(id);
-        if (optionalGallery.isPresent()
-                && optionalGallery.get().getUser().getUsername().equals(principal.getName())) {
+        if (optionalGallery.isPresent() &&
+            optionalGallery.get().getUser().getUsername().equals(principal.getName())) {
             galleryService.deleteGallery(id);
         }
         return "redirect:/galleries";
     }
 
-    // View single gallery page with access check
+    // View a single gallery
     @GetMapping("/{id}")
     public String viewGallery(@PathVariable int id, Model model, Principal principal) {
         Optional<Gallery> optionalGallery = galleryService.getGalleryById(id);
@@ -100,5 +107,14 @@ public class GalleryController {
             return "gallery";
         }
         return "redirect:/galleries";
+    }
+
+    // Show all galleries
+    @GetMapping("/all")
+    public String viewAllGalleries(Model model) {
+        List<Gallery> allGalleries = galleryRepository.findAll();
+        model.addAttribute("galleries", allGalleries);
+        model.addAttribute("isMyGallery", false);
+        return "gallerylist";
     }
 }
