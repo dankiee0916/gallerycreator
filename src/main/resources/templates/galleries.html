@@ -51,14 +51,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- empty state -->
-            <div th:if="${galleries == null or #lists.isEmpty(galleries)}" class="text-center">
-                <p class="mb-3">No galleries found.</p>
-                <a th:if="${isMyGallery}" class="btn btn-outline-light" href="/galleries/create">
-                    + Create your first gallery
-                </a>
-            </div>
         </div>
     </div>
 </body>
