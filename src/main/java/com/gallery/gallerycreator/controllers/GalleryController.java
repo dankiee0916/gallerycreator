@@ -32,14 +32,17 @@ public class GalleryController {
     @Autowired
     private UserService userService;
 
-    // list galleries for the logged in user
+    // list galleries for the logged-in user
     @GetMapping
     public String listGalleries(Model model, Principal principal) {
-        if (principal == null) return "redirect:/login";
+        if (principal == null) {
+            return "redirect:/login";
+        }
         User me = userService.getUserByUsername(principal.getName());
-        List<Gallery> mine = galleryService.getGalleriesByUser(me);
+        java.util.List<Gallery> mine = galleryService.getGalleriesByUser(me);
         model.addAttribute("galleries", mine);
-        model.addAttribute("isMyGallery", true);
+        model.addAttribute("isMyGallery", true);          // show “Create” and owner buttons
+        model.addAttribute("showOwnerButtons", true);     // edit/delete visible
         return "galleries";
     }
 
@@ -53,7 +56,9 @@ public class GalleryController {
     // create submit
     @PostMapping("/create")
     public String createGallery(@ModelAttribute Gallery form, Principal principal) {
-        if (principal == null) return "redirect:/login";
+        if (principal == null) {
+            return "redirect:/login";
+        }
         User me = userService.getUserByUsername(principal.getName());
         form.setUser(me);
         galleryService.saveGallery(form);
@@ -63,10 +68,14 @@ public class GalleryController {
     // edit form (need owner fetched to check ownership)
     @GetMapping("/edit/{id}")
     public String editGallery(@PathVariable int id, Model model, Principal principal) {
-        if (principal == null) return "redirect:/login";
+        if (principal == null) {
+            return "redirect:/login";
+        }
 
         Optional<Gallery> opt = galleryService.getGalleryById(id); // this fetches user eagerly
-        if (opt.isEmpty()) return "redirect:/galleries";
+        if (opt.isEmpty()) {
+            return "redirect:/galleries";
+        }
 
         Gallery g = opt.get();
         if (g.getUser() == null || !g.getUser().getUsername().equals(principal.getName())) {
@@ -80,10 +89,14 @@ public class GalleryController {
     // edit submit
     @PostMapping("/edit")
     public String updateGallery(@ModelAttribute Gallery form, Principal principal) {
-        if (principal == null) return "redirect:/login";
+        if (principal == null) {
+            return "redirect:/login";
+        }
 
         Optional<Gallery> existingOpt = galleryService.getGalleryById(form.getId()); // user fetched
-        if (existingOpt.isEmpty()) return "redirect:/galleries";
+        if (existingOpt.isEmpty()) {
+            return "redirect:/galleries";
+        }
 
         Gallery existing = existingOpt.get();
         if (existing.getUser() == null || !existing.getUser().getUsername().equals(principal.getName())) {
@@ -101,7 +114,9 @@ public class GalleryController {
     // delete (POST is safer, keep as-is if you wired the CSRF token)
     @PostMapping("/delete/{id}")
     public String deleteGallery(@PathVariable int id, Principal principal) {
-        if (principal == null) return "redirect:/login";
+        if (principal == null) {
+            return "redirect:/login";
+        }
 
         Optional<Gallery> opt = galleryService.getGalleryById(id); // user fetched
         if (opt.isPresent() && opt.get().getUser() != null
@@ -111,35 +126,37 @@ public class GalleryController {
         return "redirect:/galleries";
     }
 
-   // view a single gallery
-@GetMapping("/{id}")
-public String viewGallery(@PathVariable int id, Model model, Principal principal) {
-    // pull owner + photos in one go so the template can read both safely
-    Optional<Gallery> opt = galleryService.getGalleryWithUserAndPhotos(id);
-    if (opt.isEmpty()) return "redirect:/galleries";
+    // view a single gallery
+    @GetMapping("/{id}")
+    public String viewGallery(@PathVariable int id, Model model, Principal principal) {
+        // pull owner + photos in one go so the template can read both safely
+        Optional<Gallery> opt = galleryService.getGalleryWithUserAndPhotos(id);
+        if (opt.isEmpty()) {
+            return "redirect:/galleries";
+        }
 
-    Gallery g = opt.get();
-    model.addAttribute("gallery", g);
+        Gallery g = opt.get();
+        model.addAttribute("gallery", g);
 
-    // who owns this
-    boolean owns = principal != null
-            && g.getUser() != null
-            && g.getUser().getUsername().equals(principal.getName());
-    model.addAttribute("ownsGallery", owns);
+        // who owns this
+        boolean owns = principal != null
+                && g.getUser() != null
+                && g.getUser().getUsername().equals(principal.getName());
+        model.addAttribute("ownsGallery", owns);
 
-    model.addAttribute("photos", photoService.getPhotosByGalleryId(g.getId()));
+        model.addAttribute("photos", photoService.getPhotosByGalleryId(g.getId()));
 
-    System.out.println("Gallery " + g.getId() + " photos count=" + ((List<?>)model.getAttribute("photos")).size());
+        System.out.println("Gallery " + g.getId() + " photos count=" + ((List<?>) model.getAttribute("photos")).size());
 
-    return "gallery";
-}
+        return "gallery";
+    }
 
-
-    // page showing all galleries (n
+    // ALL galleries (public)
     @GetMapping("/all")
     public String allGalleries(Model model) {
-
-        model.addAttribute("isMyGallery", false);
-        return "gallerylist";
+        model.addAttribute("galleries", galleryService.getAllGalleries());
+        model.addAttribute("isMyGallery", false);         // no “Create” button
+        model.addAttribute("showOwnerButtons", false);    // hide edit/delete here
+        return "galleries";
     }
 }

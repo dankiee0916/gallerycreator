@@ -23,6 +23,12 @@ public class GalleryService {
         return galleryRepo.findByUser(user);
     }
 
+    // Get ALL galleries (public view)
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public java.util.List<Gallery> getAllGalleries() {
+        return galleryRepo.findAll();
+    }
+
     // get a gallery by id and fetch the owner (so calling code can safely read user.username)
     @Transactional(readOnly = true)
     public Optional<Gallery> getGalleryById(int id) {
