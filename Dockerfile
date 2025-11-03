@@ -1,24 +1,22 @@
-# Use an official Java 17 runtime as the base image
-FROM eclipse-temurin:17-jdk-alpine
-
-# Set the working directory inside the container
+# ---- Build stage ----
+FROM maven:3.9-eclipse-temurin-17 AS build
 WORKDIR /app
 
-# Copy Maven wrapper and project files
-COPY .mvn/ .mvn
-COPY mvnw pom.xml ./
+# Copy pom first to cache dependencies
+COPY pom.xml .
+RUN mvn -B -DskipTests=true dependency:go-offline
 
-# Pre-download dependencies to speed up builds
-RUN ./mvnw dependency:go-offline -B
-
-# Copy the entire source code into the container
+# Copy sources and build
 COPY src ./src
+RUN mvn -B -DskipTests=true package
 
-# Build the Spring Boot app (skip tests for faster build)
-RUN ./mvnw -DskipTests=true package
+# ---- Runtime stage ----
+FROM eclipse-temurin:17-jre-alpine
+WORKDIR /app
 
-# Expose the default Spring Boot port
+# Copy the fat jar from the build stage (wildcard handles your jar name)
+COPY --from=build /app/target/*.jar app.jar
+
+# Render will pass PORT env; Spring Boot uses it via server.port=${PORT:8080}
 EXPOSE 8080
-
-# Run the Spring Boot JAR
-ENTRYPOINT ["java", "-jar", "target/gallerycreator-0.0.1-SNAPSHOT.jar"]
+ENTRYPOINT ["sh", "-c", "java -jar app.jar"]
