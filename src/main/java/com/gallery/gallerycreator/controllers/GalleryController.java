@@ -39,7 +39,7 @@ public class GalleryController {
         List<Gallery> userGalleries = galleryService.getGalleriesByUser(user);
         model.addAttribute("galleries", userGalleries);
         model.addAttribute("isMyGallery", true);
-        return "gallerylist";
+        return "galleries";
     }
 
     // Show form to create a new gallery

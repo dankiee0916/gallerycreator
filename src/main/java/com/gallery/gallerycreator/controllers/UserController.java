@@ -6,7 +6,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import com.gallery.gallerycreator.models.User;
 import com.gallery.gallerycreator.services.UserService;
@@ -30,6 +29,11 @@ public class UserController {
     // Handle registration
     @PostMapping("/register")
     public String registerUser(@ModelAttribute User user) {
+        // set a default role if not provided
+        if (user.getRole() == null || user.getRole().isBlank()) {
+            user.setRole("USER");
+        }
+
         userService.saveUser(user); // saves the hashed user
         return "redirect:/login";
     }
@@ -39,25 +43,6 @@ public class UserController {
     public String showLoginForm(HttpSession session, Model model) {
         model.addAttribute("session", session);
         return "login";
-    }
-
-    // Handle login logic
-    @PostMapping("/login")
-    public String login(@RequestParam String username,
-                        @RequestParam String password,
-                        HttpSession session,
-                        Model model) {
-
-        User user = userService.getUserByUsername(username);
-
-        if (user != null && userService.checkPassword(password, user.getPassword())) {
-            session.setAttribute("loggedInUser", user);
-            return "redirect:/galleries"; // or wherever you want to go after login
-        } else {
-            model.addAttribute("error", "Invalid username or password.");
-            model.addAttribute("session", session);
-            return "login";
-        }
     }
 
     // Handle logout

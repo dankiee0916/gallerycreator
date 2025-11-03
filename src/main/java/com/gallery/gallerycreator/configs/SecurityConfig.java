@@ -37,7 +37,7 @@ public class SecurityConfig {
                 .logoutSuccessUrl("/login?logout")        // Redirect after logout
                 .permitAll()
             );
-
+        // CSRF is enabled by default -> add hidden token in forms
         return http.build();
     }
 
