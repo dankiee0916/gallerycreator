@@ -1,6 +1,5 @@
 package com.gallery.gallerycreator.controllers;
 
-import java.io.File;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.Optional;
@@ -16,9 +15,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.gallery.gallerycreator.models.Gallery;
 import com.gallery.gallerycreator.models.Photo;
 import com.gallery.gallerycreator.services.GalleryService;
+import com.gallery.gallerycreator.services.ImageUploadService;
 import com.gallery.gallerycreator.services.PhotoService;
 
 @Controller
@@ -31,6 +30,10 @@ public class PhotoController {
     @Autowired
     private GalleryService galleryService;
 
+     @Autowired
+    private ImageUploadService imageUploadService; // cloud upload
+
+    // upload page
     @GetMapping("/upload/{galleryId}")
     public String showUploadForm(@PathVariable int galleryId, Model model) {
         model.addAttribute("photo", new Photo());
@@ -38,40 +41,39 @@ public class PhotoController {
         return "uploadphoto";
     }
 
+    // handle upload
     @PostMapping("/upload")
     public String uploadPhoto(@ModelAttribute Photo photo,
                               @RequestParam("file") MultipartFile file,
                               @RequestParam("galleryId") int galleryId,
                               Principal principal) throws IOException {
 
-        Optional<Gallery> optionalGallery = galleryService.getGalleryById(galleryId);
+        var optionalGallery = galleryService.getGalleryById(galleryId);
         if (optionalGallery.isPresent()) {
-            Gallery gallery = optionalGallery.get();
-            if (gallery.getUser().getUsername().equals(principal.getName())) {
-                if (!file.isEmpty()) {
-                    String uploadDir = System.getProperty("user.dir") + File.separator + "uploads";
-                    File uploadPath = new File(uploadDir);
-                    if (!uploadPath.exists()) uploadPath.mkdirs();
+            var gallery = optionalGallery.get();
 
-                    String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-                    File destinationFile = new File(uploadPath, fileName);
-                    file.transferTo(destinationFile);
-                    photo.setUrl("/uploads/" + fileName);
+            // only owner can add photos
+            if (gallery.getUser().getUsername().equals(principal.getName())) {
+
+                // if they picked a file, push to Cloudinary and save returned https url
+                if (file != null && !file.isEmpty()) {
+                    String httpsUrl = imageUploadService.upload(file);
+                    photo.setUrl(httpsUrl); // store external url (no /uploads local path)
                 }
 
                 photo.setGallery(gallery);
                 photoService.addPhoto(photo);
             }
         }
-
         return "redirect:/galleries/" + galleryId;
     }
 
+    // edit page
     @GetMapping("/edit/{photoId}")
     public String showEditForm(@PathVariable int photoId, Model model, Principal principal) {
-        Optional<Photo> optionalPhoto = photoService.getPhotoById(photoId);
+        var optionalPhoto = photoService.getPhotoById(photoId);
         if (optionalPhoto.isPresent()) {
-            Photo photo = optionalPhoto.get();
+            var photo = optionalPhoto.get();
             if (photo.getGallery().getUser().getUsername().equals(principal.getName())) {
                 model.addAttribute("photo", photo);
                 model.addAttribute("galleryId", photo.getGallery().getId());
@@ -81,29 +83,32 @@ public class PhotoController {
         return "redirect:/galleries";
     }
 
+    // edit submit (keep old url if no new file)
     @PostMapping("/edit")
-    public String editPhoto(@ModelAttribute Photo photo,
+    public String editPhoto(@ModelAttribute Photo form,
                             @RequestParam("file") MultipartFile file,
                             @RequestParam("galleryId") int galleryId,
                             Principal principal) throws IOException {
 
-        Optional<Gallery> optionalGallery = galleryService.getGalleryById(galleryId);
+        var optionalGallery = galleryService.getGalleryById(galleryId);
         if (optionalGallery.isPresent()) {
-            Gallery gallery = optionalGallery.get();
+            var gallery = optionalGallery.get();
+
             if (gallery.getUser().getUsername().equals(principal.getName())) {
-                if (!file.isEmpty()) {
-                    String uploadDir = System.getProperty("user.dir") + File.separator + "uploads";
-                    File uploadPath = new File(uploadDir);
-                    if (!uploadPath.exists()) uploadPath.mkdirs();
+                var existingOpt = photoService.getPhotoById(form.getId());
+                if (existingOpt.isPresent()) {
+                    var existing = existingOpt.get();
 
-                    String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-                    File destinationFile = new File(uploadPath, fileName);
-                    file.transferTo(destinationFile);
-                    photo.setUrl("/uploads/" + fileName);
+                    // if a new file was uploaded, replace the url with a fresh upload
+                    if (file != null && !file.isEmpty()) {
+                        String httpsUrl = imageUploadService.upload(file);
+                        existing.setUrl(httpsUrl);
+                    }
+
+                    existing.setCaption(form.getCaption());
+                    existing.setGallery(gallery);
+                    photoService.updatePhoto(existing);
                 }
-
-                photo.setGallery(gallery);
-                photoService.updatePhoto(photo);
             }
         }
         return "redirect:/galleries/" + galleryId;
