@@ -1,21 +1,28 @@
 package com.gallery.gallerycreator.controllers;
 
 import java.security.Principal;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.gallery.gallerycreator.models.Gallery;
+import com.gallery.gallerycreator.models.User;
 import com.gallery.gallerycreator.services.GalleryService;
 import com.gallery.gallerycreator.services.PhotoService;
+import com.gallery.gallerycreator.services.UserService;
 
 @Controller
+@RequestMapping("/galleries") // base path for everything in here
 public class GalleryController {
 
     @Autowired
@@ -24,7 +31,35 @@ public class GalleryController {
     @Autowired
     private PhotoService photoService;
 
-// View a single gallery
+    @Autowired
+    private UserService userService;
+
+    // list my galleries (after login we land here)
+    @GetMapping
+    public String listGalleries(Model model, Principal principal) {
+        // grab username safely (Principal can be null on first redirect)
+        String username = null;
+        if (principal != null) {
+            username = principal.getName();
+        } else {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getName())) {
+                username = auth.getName();
+            }
+        }
+        if (username == null) {
+            return "redirect:/login";
+        }
+
+        User user = userService.getUserByUsername(username);
+        List<Gallery> userGalleries = galleryService.getGalleriesByUser(user);
+
+        model.addAttribute("galleries", userGalleries);
+        model.addAttribute("isMyGallery", true);
+        return "galleries";
+    }
+
+    // show one gallery
     @GetMapping("/{id}")
     public String viewGallery(@PathVariable int id, Model model, Principal principal) {
         Optional<Gallery> optionalGallery = galleryService.getGalleryById(id);
@@ -32,11 +67,10 @@ public class GalleryController {
             Gallery gallery = optionalGallery.get();
             model.addAttribute("gallery", gallery);
 
-            // who owns this gallery?
+            // do I own it?
             boolean ownsGallery = false;
-            if (principal != null) {
-                ownsGallery = gallery.getUser() != null
-                        && gallery.getUser().getUsername().equals(principal.getName());
+            if (principal != null && gallery.getUser() != null) {
+                ownsGallery = gallery.getUser().getUsername().equals(principal.getName());
             }
             model.addAttribute("ownsGallery", ownsGallery);
 
@@ -48,12 +82,10 @@ public class GalleryController {
         return "redirect:/galleries";
     }
 
-// Show edit form (only if the logged-in user owns the gallery)
+    // show edit form
     @GetMapping("/edit/{id}")
     public String editGallery(@PathVariable int id, Model model, Principal principal) {
-        if (principal == null) {
-            return "redirect:/login";
-        }
+        if (principal == null) return "redirect:/login";
 
         Optional<Gallery> optionalGallery = galleryService.getGalleryById(id);
         if (optionalGallery.isPresent()
@@ -65,18 +97,13 @@ public class GalleryController {
         return "redirect:/galleries";
     }
 
-// Save gallery updates (only if the user owns it)
+    // save edits
     @PostMapping("/edit")
     public String updateGallery(@ModelAttribute Gallery form, Principal principal) {
-        if (principal == null) {
-            return "redirect:/login";
-        }
+        if (principal == null) return "redirect:/login";
 
-        // load the real entity first (form.user is null)
         Optional<Gallery> existingOpt = galleryService.getGalleryById(form.getId());
-        if (existingOpt.isEmpty()) {
-            return "redirect:/galleries";
-        }
+        if (existingOpt.isEmpty()) return "redirect:/galleries";
 
         Gallery existing = existingOpt.get();
         if (existing.getUser() == null
@@ -84,7 +111,7 @@ public class GalleryController {
             return "redirect:/galleries";
         }
 
-        // update allowed fields
+        // update fields we allow
         existing.setTitle(form.getTitle());
         existing.setDescription(form.getDescription());
         galleryService.saveGallery(existing);
@@ -92,12 +119,10 @@ public class GalleryController {
         return "redirect:/galleries/" + existing.getId();
     }
 
-// Delete a gallery (POST is safer)
+    // delete (POST is safer)
     @PostMapping("/delete/{id}")
     public String deleteGallery(@PathVariable int id, Principal principal) {
-        if (principal == null) {
-            return "redirect:/login";
-        }
+        if (principal == null) return "redirect:/login";
 
         Optional<Gallery> optionalGallery = galleryService.getGalleryById(id);
         if (optionalGallery.isPresent()
@@ -105,6 +130,24 @@ public class GalleryController {
                 && optionalGallery.get().getUser().getUsername().equals(principal.getName())) {
             galleryService.deleteGallery(id);
         }
+        return "redirect:/galleries";
+    }
+
+    // create form
+    @GetMapping("/create")
+    public String showCreateForm(Model model) {
+        model.addAttribute("gallery", new Gallery());
+        return "creategallery";
+    }
+
+    // create submit
+    @PostMapping("/create")
+    public String createGallery(@ModelAttribute Gallery gallery, Principal principal) {
+        if (principal == null) return "redirect:/login";
+
+        User user = userService.getUserByUsername(principal.getName());
+        gallery.setUser(user);
+        galleryService.saveGallery(gallery);
         return "redirect:/galleries";
     }
 }
