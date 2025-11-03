@@ -10,5 +10,9 @@ import com.gallery.gallerycreator.models.Photo;
 
 @Repository
 public interface PhotoRepository extends JpaRepository<Photo, Integer> {
-    List<Photo> findByGallery(Gallery gallery);  
+    // you already have this
+    List<Photo> findByGallery(Gallery gallery);
+
+    // safer version that doesn’t rely on entity equality
+    List<Photo> findByGallery_Id(int galleryId);
 }

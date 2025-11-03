@@ -35,10 +35,16 @@ public class PhotoService {
         return photoRepository.findById(id);
     }
 
-    // Get all photos in a specific gallery
+    // Get all photos in a specific gallery (entity version)
     @Transactional(readOnly = true)
     public List<Photo> getPhotosByGallery(Gallery gallery) {
         return photoRepository.findByGallery(gallery);
+    }
+
+    // Get all photos in a specific gallery (id version – use this from controllers)
+    @Transactional(readOnly = true)
+    public List<Photo> getPhotosByGalleryId(int galleryId) {
+        return photoRepository.findByGallery_Id(galleryId);
     }
 
     // Update photo info

@@ -111,29 +111,34 @@ public class GalleryController {
         return "redirect:/galleries";
     }
 
-    // view a single gallery
-    @GetMapping("/{id}")
-    public String viewGallery(@PathVariable int id, Model model, Principal principal) {
-        // pull owner + photos in one go so the template can read both safely
-        Optional<Gallery> opt = galleryService.getGalleryWithUserAndPhotos(id);
-        if (opt.isEmpty()) return "redirect:/galleries";
+   // view a single gallery
+@GetMapping("/{id}")
+public String viewGallery(@PathVariable int id, Model model, Principal principal) {
+    // pull owner + photos in one go so the template can read both safely
+    Optional<Gallery> opt = galleryService.getGalleryWithUserAndPhotos(id);
+    if (opt.isEmpty()) return "redirect:/galleries";
 
-        Gallery g = opt.get();
-        model.addAttribute("gallery", g);
-        // who owns this
-        boolean owns = principal != null
-                && g.getUser() != null
-                && g.getUser().getUsername().equals(principal.getName());
-        model.addAttribute("ownsGallery", owns);
-        // photos list is already fetched; if you prefer using service list:
-        // model.addAttribute("photos", photoService.getPhotosByGallery(g));
-        return "gallery";
-    }
+    Gallery g = opt.get();
+    model.addAttribute("gallery", g);
 
-    // optional page showing all galleries (not just mine)
+    // who owns this
+    boolean owns = principal != null
+            && g.getUser() != null
+            && g.getUser().getUsername().equals(principal.getName());
+    model.addAttribute("ownsGallery", owns);
+
+    model.addAttribute("photos", photoService.getPhotosByGalleryId(g.getId()));
+
+    System.out.println("Gallery " + g.getId() + " photos count=" + ((List<?>)model.getAttribute("photos")).size());
+
+    return "gallery";
+}
+
+
+    // page showing all galleries (n
     @GetMapping("/all")
     public String allGalleries(Model model) {
-        // if you want literally ALL: use repo.findAll(). Kept minimal.
+
         model.addAttribute("isMyGallery", false);
         return "gallerylist";
     }

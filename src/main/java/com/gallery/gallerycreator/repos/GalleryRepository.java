@@ -21,4 +21,6 @@ public interface GalleryRepository extends JpaRepository<Gallery, Integer> {
     // if you want gallery + owner + photos for the view page in one shot
     @EntityGraph(attributePaths = { "user", "photos" })
     Optional<Gallery> findWithUserAndPhotosById(int id);
+
+    
 }
