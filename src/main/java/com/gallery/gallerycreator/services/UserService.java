@@ -1,8 +1,8 @@
 package com.gallery.gallerycreator.services;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.gallery.gallerycreator.models.User;
 import com.gallery.gallerycreator.repos.UserRepository;
@@ -10,21 +10,28 @@ import com.gallery.gallerycreator.repos.UserRepository;
 @Service
 public class UserService {
 
-    private final UserRepository userRepo;
-    private final PasswordEncoder passwordEncoder;
+    @Autowired
+    private UserRepository userRepo;
 
-    public UserService(UserRepository userRepo, PasswordEncoder passwordEncoder) {
-        this.userRepo = userRepo;
-        this.passwordEncoder = passwordEncoder;
-    }
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
-    @Transactional
-    public User saveUser(User user) {
+    // Saves a new user with a hashed password
+    @org.springframework.transaction.annotation.Transactional
+    public void saveUser(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return userRepo.save(user);
+        userRepo.save(user);
+        // simple log so you can see it in Render logs
+        System.out.println("Saved user: " + user.getUsername());
     }
 
     public User getUserByUsername(String username) {
         return userRepo.findByUsername(username);
     }
+
+    // Checks the password of user
+    public boolean checkPassword(String rawPassword, String encodedPassword) {
+        return passwordEncoder.matches(rawPassword, encodedPassword);
+    }
 }
+

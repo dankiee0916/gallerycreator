@@ -29,6 +29,11 @@ public class UserController {
     // Handle registration
     @PostMapping("/register")
     public String registerUser(@ModelAttribute User user) {
+        // set a default role if not provided
+        if (user.getRole() == null || user.getRole().isBlank()) {
+            user.setRole("USER");
+        }
+
         userService.saveUser(user); // saves the hashed user
         return "redirect:/login";
     }

@@ -10,6 +10,8 @@ import com.gallery.gallerycreator.models.Gallery;
 import com.gallery.gallerycreator.models.User;
 import com.gallery.gallerycreator.repos.GalleryRepository;
 
+import io.micrometer.common.lang.NonNull;
+
 @Service
 public class GalleryService {
 
@@ -27,7 +29,7 @@ public class GalleryService {
     }
 
     // Save or update a gallery
-    public void saveGallery(Gallery gallery) {
+    public @NonNull void saveGallery(Gallery gallery) {
         galleryRepo.save(gallery);
     }
 
