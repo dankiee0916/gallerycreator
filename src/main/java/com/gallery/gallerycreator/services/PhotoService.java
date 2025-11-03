@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.gallery.gallerycreator.models.Gallery;
 import com.gallery.gallerycreator.models.Photo;
@@ -16,26 +17,38 @@ public class PhotoService {
     @Autowired
     private PhotoRepository photoRepository;
 
+    // Add a new photo
+    @Transactional
     public Photo addPhoto(Photo photo) {
         return photoRepository.save(photo);
     }
 
+    // Get all photos
+    @Transactional(readOnly = true)
     public List<Photo> getAllPhotos() {
         return photoRepository.findAll();
     }
 
+    // Get photo by ID
+    @Transactional(readOnly = true)
     public Optional<Photo> getPhotoById(int id) {
         return photoRepository.findById(id);
     }
 
+    // Get all photos in a specific gallery
+    @Transactional(readOnly = true)
     public List<Photo> getPhotosByGallery(Gallery gallery) {
         return photoRepository.findByGallery(gallery);
     }
 
+    // Update photo info
+    @Transactional
     public Photo updatePhoto(Photo photo) {
         return photoRepository.save(photo);
     }
 
+    // Delete photo by ID
+    @Transactional
     public void deletePhoto(int id) {
         photoRepository.deleteById(id);
     }
