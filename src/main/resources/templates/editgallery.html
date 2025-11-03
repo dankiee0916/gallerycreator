@@ -13,8 +13,11 @@
 
         <div class="container mt-5 text-light">
             <h2 class="text-center mb-4">Edit Gallery</h2>
+
+            <!-- keep POST + include CSRF -->
             <form th:action="@{/galleries/edit}" th:object="${gallery}" method="post">
                 <input type="hidden" th:field="*{id}" />
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
 
                 <div class="mb-3">
                     <label class="form-label">Title</label>
