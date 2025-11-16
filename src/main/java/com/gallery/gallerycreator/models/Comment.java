@@ -12,51 +12,44 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
+/**
+ * Comment left on a gallery.
+ */
 @Entity
 @Table(name = "comments")
 public class Comment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
 
-    // actual text for the comment
-    @Column(nullable = false, columnDefinition = "text")
-    private String text;
-
-    // gallery that this comment belongs to
-    @ManyToOne(fetch = FetchType.LAZY)
+    // comment belongs to one gallery
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "gallery_id", nullable = false)
     private Gallery gallery;
 
-    // user who wrote the comment
-    @ManyToOne(fetch = FetchType.LAZY)
+    // comment created by one user
+    // EAGER so username can be read safely in the Thymeleaf view
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    // time the comment was created
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
+    // text body of the comment
+    @Column(nullable = false, length = 500)
+    private String text;
 
-    public Comment() {
-    }
+    // timestamp when comment was created
+    @Column(nullable = false)
+    private LocalDateTime createdAt = LocalDateTime.now();
 
-    // getters and setters kept simple
+    // ===== getters and setters =====
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
-    }
-
-    public String getText() {
-        return text;
-    }
-
-    public void setText(String text) {
-        this.text = text;
     }
 
     public Gallery getGallery() {
@@ -73,6 +66,14 @@ public class Comment {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
     }
 
     public LocalDateTime getCreatedAt() {
