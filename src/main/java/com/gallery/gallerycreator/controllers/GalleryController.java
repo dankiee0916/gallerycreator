@@ -140,7 +140,7 @@ public class GalleryController {
     public String viewGallery(@PathVariable int id, Model model, Principal principal) {
 
         // this method should load user and photos (you already had it in the service)
-        Optional<Gallery> opt = galleryService.getGalleryWithUserAndPhotos(id);
+        Optional<Gallery> opt = galleryService.getGalleryById(id);
         if (opt.isEmpty()) {
             return "redirect:/galleries";
         }

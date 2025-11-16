@@ -5,22 +5,23 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import com.gallery.gallerycreator.models.Gallery;
 import com.gallery.gallerycreator.models.User;
 
+@Repository
 public interface GalleryRepository extends JpaRepository<Gallery, Integer> {
 
-    // all galleries for a user
+    // galleries for one user, load the user object too
+    @EntityGraph(attributePaths = { "user" })
     List<Gallery> findByUser(User user);
 
-    // get one gallery but also fetch the owner so we can check ownership
+    // all galleries, with user loaded (used on /galleries/all)
     @EntityGraph(attributePaths = { "user" })
-    Optional<Gallery> findById(int id);
+    List<Gallery> findAll();
 
-    // if you want gallery + owner + photos for the view page in one shot
+    // single gallery with user and photos (used on /galleries/{id})
     @EntityGraph(attributePaths = { "user", "photos" })
-    Optional<Gallery> findWithUserAndPhotosById(int id);
-
-    
+    Optional<Gallery> findById(Integer id);
 }

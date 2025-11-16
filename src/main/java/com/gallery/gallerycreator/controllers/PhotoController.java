@@ -31,7 +31,7 @@ public class PhotoController {
     @Autowired
     private GalleryService galleryService;
 
-    // show upload form
+    // upload form
     @GetMapping("/upload/{galleryId}")
     public String showUploadForm(@PathVariable int galleryId, Model model) {
         model.addAttribute("photo", new Photo());
@@ -56,13 +56,12 @@ public class PhotoController {
         }
 
         Gallery gallery = optionalGallery.get();
-
-        // only owner can upload to this gallery
         if (gallery.getUser() == null ||
-            !gallery.getUser().getUsername().equals(principal.getName())) {
+                !gallery.getUser().getUsername().equals(principal.getName())) {
             return "redirect:/galleries";
         }
 
+        // simple local upload – same as you had
         if (!file.isEmpty()) {
             String uploadDir = System.getProperty("user.dir") + File.separator + "uploads";
             File uploadPath = new File(uploadDir);
@@ -73,7 +72,6 @@ public class PhotoController {
             String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
             File destinationFile = new File(uploadPath, fileName);
             file.transferTo(destinationFile);
-
             photo.setUrl("/uploads/" + fileName);
         }
 
@@ -86,7 +84,6 @@ public class PhotoController {
     // edit form
     @GetMapping("/edit/{photoId}")
     public String showEditForm(@PathVariable int photoId, Model model, Principal principal) {
-
         if (principal == null) {
             return "redirect:/login";
         }
@@ -97,10 +94,8 @@ public class PhotoController {
         }
 
         Photo photo = optionalPhoto.get();
-
-        if (photo.getGallery() == null ||
-            photo.getGallery().getUser() == null ||
-            !photo.getGallery().getUser().getUsername().equals(principal.getName())) {
+        if (photo.getGallery().getUser() == null ||
+                !photo.getGallery().getUser().getUsername().equals(principal.getName())) {
             return "redirect:/galleries";
         }
 
@@ -109,9 +104,9 @@ public class PhotoController {
         return "editphoto";
     }
 
-    // edit submit
+    // handle edit submit
     @PostMapping("/edit")
-    public String editPhoto(@ModelAttribute Photo photo,
+    public String editPhoto(@ModelAttribute Photo form,
                             @RequestParam("file") MultipartFile file,
                             @RequestParam("galleryId") int galleryId,
                             Principal principal) throws IOException {
@@ -120,30 +115,22 @@ public class PhotoController {
             return "redirect:/login";
         }
 
-        Optional<Gallery> optionalGallery = galleryService.getGalleryById(galleryId);
-        if (optionalGallery.isEmpty()) {
+        Optional<Photo> optionalPhoto = photoService.getPhotoById(form.getId());
+        if (optionalPhoto.isEmpty()) {
             return "redirect:/galleries";
         }
 
-        Gallery gallery = optionalGallery.get();
+        Photo existing = optionalPhoto.get();
+        Gallery gallery = existing.getGallery();
 
         if (gallery.getUser() == null ||
-            !gallery.getUser().getUsername().equals(principal.getName())) {
+                !gallery.getUser().getUsername().equals(principal.getName())) {
             return "redirect:/galleries";
         }
 
-        // load the existing photo so we don't lose fields
-        Optional<Photo> existingOpt = photoService.getPhotoById(photo.getId());
-        if (existingOpt.isEmpty()) {
-            return "redirect:/galleries/" + galleryId;
-        }
+        existing.setCaption(form.getCaption());
 
-        Photo existing = existingOpt.get();
-
-        // update caption
-        existing.setCaption(photo.getCaption());
-
-        // if new file was uploaded, replace image
+        // replace file only if a new one is uploaded
         if (!file.isEmpty()) {
             String uploadDir = System.getProperty("user.dir") + File.separator + "uploads";
             File uploadPath = new File(uploadDir);
@@ -154,51 +141,33 @@ public class PhotoController {
             String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
             File destinationFile = new File(uploadPath, fileName);
             file.transferTo(destinationFile);
-
             existing.setUrl("/uploads/" + fileName);
         }
 
         photoService.updatePhoto(existing);
-
         return "redirect:/galleries/" + galleryId;
     }
 
-    // delete photo
+    // delete photo (GET is fine for your class)
     @GetMapping("/delete/{photoId}")
     public String deletePhoto(@PathVariable int photoId, Principal principal) {
-
         if (principal == null) {
             return "redirect:/login";
         }
 
         Optional<Photo> optionalPhoto = photoService.getPhotoById(photoId);
-        if (optionalPhoto.isEmpty()) {
-            return "redirect:/galleries";
-        }
-
-        Photo photo = optionalPhoto.get();
-
-        if (photo.getGallery() == null ||
-            photo.getGallery().getUser() == null ||
-            !photo.getGallery().getUser().getUsername().equals(principal.getName())) {
-            return "redirect:/galleries";
-        }
-
-        int galleryId = photo.getGallery().getId();
-
-        photoService.deletePhoto(photoId);
-
-        return "redirect:/galleries/" + galleryId;
-    }
-
-    // view a single photo
-    @GetMapping("/view/{photoId}")
-    public String viewPhoto(@PathVariable int photoId, Model model) {
-        Optional<Photo> optionalPhoto = photoService.getPhotoById(photoId);
         if (optionalPhoto.isPresent()) {
-            model.addAttribute("photo", optionalPhoto.get());
-            return "viewphoto";
+            Photo photo = optionalPhoto.get();
+            Gallery gallery = photo.getGallery();
+
+            if (gallery.getUser() != null &&
+                    gallery.getUser().getUsername().equals(principal.getName())) {
+                int galleryId = gallery.getId();
+                photoService.deletePhoto(photoId);
+                return "redirect:/galleries/" + galleryId;
+            }
         }
+
         return "redirect:/galleries";
     }
 }

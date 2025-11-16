@@ -15,41 +15,35 @@ import com.gallery.gallerycreator.repos.GalleryRepository;
 public class GalleryService {
 
     @Autowired
-    private GalleryRepository galleryRepo;
+    private GalleryRepository galleryRepository;
 
-    // get all galleries owned by a user
+    // list galleries for one user
     @Transactional(readOnly = true)
     public List<Gallery> getGalleriesByUser(User user) {
-        return galleryRepo.findByUser(user);
+        return galleryRepository.findByUser(user);
     }
 
-    // Get ALL galleries (public view)
-    @org.springframework.transaction.annotation.Transactional(readOnly = true)
-    public java.util.List<Gallery> getAllGalleries() {
-        return galleryRepo.findAll();
+    // list all galleries (used on /galleries/all)
+    @Transactional(readOnly = true)
+    public List<Gallery> getAllGalleries() {
+        return galleryRepository.findAll();
     }
 
-    // get a gallery by id and fetch the owner (so calling code can safely read user.username)
+    // single gallery with user + photos
     @Transactional(readOnly = true)
     public Optional<Gallery> getGalleryById(int id) {
-        return galleryRepo.findById(id);
+        return galleryRepository.findById(id);
     }
 
-    // sometimes we also want photos loaded for the view page
-    @Transactional(readOnly = true)
-    public Optional<Gallery> getGalleryWithUserAndPhotos(int id) {
-        return galleryRepo.findWithUserAndPhotosById(id);
-    }
-
-    // save or update
+    // save or update a gallery
     @Transactional
-    public void saveGallery(Gallery gallery) {
-        galleryRepo.save(gallery);
+    public Gallery saveGallery(Gallery gallery) {
+        return galleryRepository.save(gallery);
     }
 
-    // delete
+    // delete gallery
     @Transactional
     public void deleteGallery(int id) {
-        galleryRepo.deleteById(id);
+        galleryRepository.deleteById(id);
     }
 }
