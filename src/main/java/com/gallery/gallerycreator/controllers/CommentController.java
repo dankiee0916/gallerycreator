@@ -19,7 +19,7 @@ import com.gallery.gallerycreator.services.GalleryService;
 import com.gallery.gallerycreator.services.UserService;
 
 @Controller
-@RequestMapping("/galleries")
+@RequestMapping("/galleries")   // base path for all routes here
 public class CommentController {
 
     @Autowired
@@ -31,66 +31,66 @@ public class CommentController {
     @Autowired
     private UserService userService;
 
-    // handle form submit to add a new comment
+    // add a new comment to a gallery
     @PostMapping("/{galleryId}/comments")
     public String addComment(@PathVariable int galleryId,
-                             @ModelAttribute("newComment") Comment formComment,
+                             @ModelAttribute("newComment") Comment newComment,
                              Principal principal) {
 
-        // must be logged in to comment
-        if (principal == null) {
-            return "redirect:/login";
-        }
-
+        // make sure gallery exists
         Optional<Gallery> galleryOpt = galleryService.getGalleryById(galleryId);
         if (galleryOpt.isEmpty()) {
             return "redirect:/galleries";
         }
 
-        Gallery gallery = galleryOpt.get();
+        // make sure user is logged in
+        if (principal == null) {
+            return "redirect:/login";
+        }
+
         User user = userService.getUserByUsername(principal.getName());
+        if (user == null) {
+            return "redirect:/login";
+        }
 
-        Comment comment = new Comment();
-        comment.setText(formComment.getText());
-        comment.setGallery(gallery);
-        comment.setUser(user);
-        comment.setCreatedAt(LocalDateTime.now());
+        // fill in extra fields
+        newComment.setGallery(galleryOpt.get());
+        newComment.setUser(user);
+        newComment.setCreatedAt(LocalDateTime.now());
 
-        commentService.addComment(comment);
+        commentService.addComment(newComment);
 
+        // send back to the gallery page
         return "redirect:/galleries/" + galleryId;
     }
 
-    // delete a comment (author or gallery owner allowed)
-  // CommentController.java
+    // delete a comment (owner or gallery owner only)
+    @PostMapping("/comments/delete/{id}")
+    public String deleteComment(@PathVariable int id, Principal principal) {
 
-@PostMapping("/galleries/comments/delete/{id}")
-public String deleteComment(@PathVariable int id, Principal principal) {
-    Optional<Comment> optionalComment = commentService.getCommentById(id);
-    if (optionalComment.isEmpty()) {
-        return "redirect:/galleries";
+        Optional<Comment> commentOpt = commentService.getCommentById(id);
+        if (commentOpt.isEmpty()) {
+            return "redirect:/galleries";
+        }
+
+        Comment comment = commentOpt.get();
+        Gallery gallery = comment.getGallery();
+
+        // no user -> just go back
+        if (principal == null) {
+            return "redirect:/galleries/" + gallery.getId();
+        }
+
+        String currentUser = principal.getName();
+        String galleryOwner = gallery.getUser().getUsername();
+        String commentOwner = comment.getUser().getUsername();
+
+        // only delete if user owns the comment or the gallery
+        if (currentUser.equals(galleryOwner) || currentUser.equals(commentOwner)) {
+            commentService.deleteComment(id);
+        }
+
+        // always redirect back to the gallery page
+        return "redirect:/galleries/" + gallery.getId();
     }
-
-    Comment comment = optionalComment.get();
-
-    // grab gallery id before doing anything else
-    int galleryId = comment.getGallery() != null ? comment.getGallery().getId() : 0;
-
-    // simple safety checks so nothing blows up
-    if (principal != null
-            && comment.getUser() != null
-            && principal.getName().equals(comment.getUser().getUsername())) {
-
-        // user owns this comment, so it can be deleted
-        commentService.deleteComment(id);
-    }
-
-    if (galleryId > 0) {
-        return "redirect:/galleries/" + galleryId;
-    } else {
-        return "redirect:/galleries";
-    }
-}
-
-
 }
