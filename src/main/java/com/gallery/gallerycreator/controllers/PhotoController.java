@@ -186,13 +186,12 @@ public class PhotoController {
 
         int galleryId = photo.getGallery().getId();
 
-        // optional: also delete file from disk later if you want
         photoService.deletePhoto(photoId);
 
         return "redirect:/galleries/" + galleryId;
     }
 
-    // view a single photo (if you still use this)
+    // view a single photo
     @GetMapping("/view/{photoId}")
     public String viewPhoto(@PathVariable int photoId, Model model) {
         Optional<Photo> optionalPhoto = photoService.getPhotoById(photoId);
