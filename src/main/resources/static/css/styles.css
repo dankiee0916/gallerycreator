@@ -51,3 +51,13 @@
     background-color: #fff;
     color: #000;
 }
+
+/* Preview of images in gallery list */
+.gallery-card {
+    padding: 15px;
+    background-color: #222;
+    border: 1px solid #888;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+

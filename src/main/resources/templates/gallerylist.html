@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <title>View All Galleries</title>
     <link rel="stylesheet" th:href="@{/css/styles.css}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
+
 <body>
 
     <!-- Background image + dark overlay -->
@@ -13,7 +15,7 @@
     <div class="bg-overlay">
 
         <!-- Navbar fragment -->
-       <div th:replace="~{fragments/navbar :: navbar}"></div>
+        <div th:replace="~{fragments/navbar :: navbar}"></div>
 
         <!-- Main content -->
         <div class="container mt-5 text-light">
@@ -29,18 +31,28 @@
                     <div class="list-group">
                         <!-- If no galleries -->
                         <div th:if="${#lists.isEmpty(galleries)}" class="text-center">
-                            <p th:text="${isMyGallery} ? 'You haven\'t created any galleries yet.' : 'No galleries have been created yet.'"></p>
+                            <p
+                                th:text="${isMyGallery} ? 'You haven\'t created any galleries yet.' : 'No galleries have been created yet.'">
+                            </p>
                         </div>
 
                         <!-- Gallery list -->
-                        <a th:each="gallery : ${galleries}"
-                           th:href="@{'/galleries/' + ${gallery.id}}"
-                           class="list-group-item list-group-item-action bg-dark text-light border-light mb-2">
+                        <a th:each="gallery : ${galleries}" th:href="@{'/galleries/' + ${gallery.id}}"
+                            class="list-group-item list-group-item-action bg-dark text-light border-light mb-2 d-flex align-items-center">
+
+                            <!-- Preview image -->
+                            <img th:src="${gallery.photos != null && !gallery.photos.isEmpty() ? gallery.photos.get(0).url : '/images/background.jpg'}"
+                                alt="Preview" class="me-3"
+                                style="width: 90px; height: 60px; object-fit: cover; border-radius: 5px;">
+
+                            <!-- Gallery title + username -->
                             <div>
                                 <h5 th:text="${gallery.title}">Gallery Title</h5>
                                 <small th:text="'Created by: ' + ${gallery.user.username}">Created by: user123</small>
                             </div>
+
                         </a>
+
                     </div>
                 </div>
             </div>
@@ -48,4 +60,5 @@
 
     </div>
 </body>
+
 </html>
