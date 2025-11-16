@@ -42,9 +42,9 @@ public class PhotoController {
     // handle upload
     @PostMapping("/upload")
     public String uploadPhoto(@ModelAttribute Photo photo,
-                              @RequestParam("file") MultipartFile file,
-                              @RequestParam("galleryId") int galleryId,
-                              Principal principal) throws IOException {
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("galleryId") int galleryId,
+            Principal principal) throws IOException {
 
         if (principal == null) {
             return "redirect:/login";
@@ -107,9 +107,9 @@ public class PhotoController {
     // handle edit submit
     @PostMapping("/edit")
     public String editPhoto(@ModelAttribute Photo form,
-                            @RequestParam("file") MultipartFile file,
-                            @RequestParam("galleryId") int galleryId,
-                            Principal principal) throws IOException {
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("galleryId") int galleryId,
+            Principal principal) throws IOException {
 
         if (principal == null) {
             return "redirect:/login";
@@ -151,23 +151,31 @@ public class PhotoController {
     // delete photo (GET is fine for your class)
     @GetMapping("/delete/{photoId}")
     public String deletePhoto(@PathVariable int photoId, Principal principal) {
-        if (principal == null) {
-            return "redirect:/login";
-        }
-
         Optional<Photo> optionalPhoto = photoService.getPhotoById(photoId);
-        if (optionalPhoto.isPresent()) {
-            Photo photo = optionalPhoto.get();
-            Gallery gallery = photo.getGallery();
-
-            if (gallery.getUser() != null &&
-                    gallery.getUser().getUsername().equals(principal.getName())) {
-                int galleryId = gallery.getId();
-                photoService.deletePhoto(photoId);
-                return "redirect:/galleries/" + galleryId;
-            }
+        if (optionalPhoto.isEmpty()) {
+            return "redirect:/galleries";
         }
 
-        return "redirect:/galleries";
+        Photo photo = optionalPhoto.get();
+
+        // grab gallery and owner info up front
+        Gallery gallery = photo.getGallery();
+        int galleryId = (gallery != null) ? gallery.getId() : 0;
+        String ownerUsername = (gallery != null && gallery.getUser() != null)
+                ? gallery.getUser().getUsername()
+                : null;
+
+        // only allow delete if logged in user is owner
+        if (principal != null && ownerUsername != null
+                && principal.getName().equals(ownerUsername)) {
+            photoService.deletePhoto(photoId);
+        }
+
+        if (galleryId > 0) {
+            return "redirect:/galleries/" + galleryId;
+        } else {
+            return "redirect:/galleries";
+        }
     }
+
 }

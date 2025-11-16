@@ -62,35 +62,35 @@ public class CommentController {
     }
 
     // delete a comment (author or gallery owner allowed)
-    @PostMapping("/comments/delete/{commentId}")
-    public String deleteComment(@PathVariable int commentId, Principal principal) {
+  // CommentController.java
 
-        if (principal == null) {
-            return "redirect:/login";
-        }
-
-        Optional<Comment> commentOpt = commentService.getCommentById(commentId);
-        if (commentOpt.isEmpty()) {
-            return "redirect:/galleries";
-        }
-
-        Comment comment = commentOpt.get();
-        int galleryId = comment.getGallery().getId();
-
-        String username = principal.getName();
-
-        boolean isAuthor = comment.getUser() != null &&
-                username.equals(comment.getUser().getUsername());
-
-        boolean isGalleryOwner = comment.getGallery() != null &&
-                comment.getGallery().getUser() != null &&
-                username.equals(comment.getGallery().getUser().getUsername());
-
-        // only delete if user wrote it or owns the gallery
-        if (isAuthor || isGalleryOwner) {
-            commentService.deleteComment(commentId);
-        }
-
-        return "redirect:/galleries/" + galleryId;
+@PostMapping("/galleries/comments/delete/{id}")
+public String deleteComment(@PathVariable int id, Principal principal) {
+    Optional<Comment> optionalComment = commentService.getCommentById(id);
+    if (optionalComment.isEmpty()) {
+        return "redirect:/galleries";
     }
+
+    Comment comment = optionalComment.get();
+
+    // grab gallery id before doing anything else
+    int galleryId = comment.getGallery() != null ? comment.getGallery().getId() : 0;
+
+    // simple safety checks so nothing blows up
+    if (principal != null
+            && comment.getUser() != null
+            && principal.getName().equals(comment.getUser().getUsername())) {
+
+        // user owns this comment, so it can be deleted
+        commentService.deleteComment(id);
+    }
+
+    if (galleryId > 0) {
+        return "redirect:/galleries/" + galleryId;
+    } else {
+        return "redirect:/galleries";
+    }
+}
+
+
 }

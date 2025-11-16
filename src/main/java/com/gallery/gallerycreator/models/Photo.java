@@ -24,7 +24,7 @@ public class Photo {
     @Column(nullable = false, length = 255)
     private String url;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "gallery_id", nullable = false)
     private Gallery gallery;
 
