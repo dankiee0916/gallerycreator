@@ -37,11 +37,14 @@ public class Gallery {
     private List<Photo> photos;
 
     @Transient
+    private String previewUrl;
+
     public String getPreviewUrl() {
-        if (photos != null && !photos.isEmpty()) {
-            return photos.get(0).getUrl();
-        }
-        return "/images/placeholder.png"; // or any default image
+        return previewUrl;
+    }
+
+    public void setPreviewUrl(String previewUrl) {
+        this.previewUrl = previewUrl;
     }
 
     public Gallery() {

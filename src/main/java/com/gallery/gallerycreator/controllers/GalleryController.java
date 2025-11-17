@@ -84,8 +84,8 @@ public class GalleryController {
         }
 
         Gallery g = opt.get();
-        if (g.getUser() == null ||
-                !g.getUser().getUsername().equals(principal.getName())) {
+        if (g.getUser() == null
+                || !g.getUser().getUsername().equals(principal.getName())) {
             return "redirect:/galleries";
         }
 
@@ -106,8 +106,8 @@ public class GalleryController {
         }
 
         Gallery existing = existingOpt.get();
-        if (existing.getUser() == null ||
-                !existing.getUser().getUsername().equals(principal.getName())) {
+        if (existing.getUser() == null
+                || !existing.getUser().getUsername().equals(principal.getName())) {
             return "redirect:/galleries";
         }
 
@@ -171,4 +171,15 @@ public class GalleryController {
         model.addAttribute("isMyGallery", false);
         return "gallerylist";
     }
+
+    @GetMapping("/galleries/all")
+    public String viewAllGalleries(Model model) {
+        List<Gallery> galleries = galleryService.getAllGalleriesWithPreview();
+
+        model.addAttribute("galleries", galleries);
+        model.addAttribute("isMyGallery", false);
+
+        return "gallerylist";
+    }
+
 }

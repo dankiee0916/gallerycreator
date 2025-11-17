@@ -19,4 +19,8 @@ public interface PhotoRepository extends JpaRepository<Photo, Integer> {
     // photo with gallery + gallery.user loaded (used for edit/delete)
     @EntityGraph(attributePaths = { "gallery", "gallery.user" })
     Optional<Photo> findById(Integer id);
+
+    // gets the first photo for a gallery (smallest id)
+    Photo findFirstByGalleryOrderByIdAsc(Gallery gallery);
+
 }
