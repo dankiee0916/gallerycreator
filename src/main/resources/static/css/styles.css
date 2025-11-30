@@ -61,3 +61,11 @@
     margin-bottom: 15px;
 }
 
+/* make all gallery images the same size */
+.gallery-photo-img {
+    width: 100%;
+    height: 350px;      
+    object-fit: cover;  
+}
+
+

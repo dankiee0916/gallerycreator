@@ -18,7 +18,11 @@
 
             <!-- Photo Display -->
             <div class="text-center mb-4">
-                <img th:src="${photo.url}" class="img-fluid rounded shadow" alt="Photo" style="max-height: 500px;" />
+                <img th:src="${photo.url}"
+     class="img-fluid rounded shadow"
+     alt="Photo"
+     style="max-height: 500px;" />
+>
 
                 <p class="mt-3" th:text="${photo.caption}"></p>
             </div>

@@ -180,12 +180,20 @@ public class PhotoController {
 
     @GetMapping("/view/{id}")
     public String viewPhoto(@PathVariable("id") int id, Model model) {
-        Optional<Photo> photo = photoService.getPhotoById(id);
-        if (photo == null) {
-            return "redirect:/galleries/all"; 
+
+        // get the optional photo from the service
+        Optional<Photo> optionalPhoto = photoService.getPhotoById(id);
+
+        // if not found, just go back to all galleries
+        if (optionalPhoto.isEmpty()) {
+            return "redirect:/galleries/all";
         }
 
+        // unwrap the Optional so Thymeleaf gets a real Photo object
+        Photo photo = optionalPhoto.get();
+
         model.addAttribute("photo", photo);
+
         return "viewphoto";
     }
 
