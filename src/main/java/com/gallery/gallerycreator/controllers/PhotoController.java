@@ -1,6 +1,5 @@
 package com.gallery.gallerycreator.controllers;
 
-import java.io.File;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.Optional;
@@ -19,7 +18,8 @@ import org.springframework.web.multipart.MultipartFile;
 import com.gallery.gallerycreator.models.Gallery;
 import com.gallery.gallerycreator.models.Photo;
 import com.gallery.gallerycreator.services.GalleryService;
-import com.gallery.gallerycreator.services.PhotoService;
+import com.gallery.gallerycreator.services.ImageUploadService;
+import com.gallery.gallerycreator.services.PhotoService;   
 
 @Controller
 @RequestMapping("/photos")
@@ -30,6 +30,9 @@ public class PhotoController {
 
     @Autowired
     private GalleryService galleryService;
+
+    @Autowired
+    private ImageUploadService imageUploadService;   
 
     // upload form
     @GetMapping("/upload/{galleryId}")
@@ -42,9 +45,9 @@ public class PhotoController {
     // handle upload
     @PostMapping("/upload")
     public String uploadPhoto(@ModelAttribute Photo photo,
-            @RequestParam("file") MultipartFile file,
-            @RequestParam("galleryId") int galleryId,
-            Principal principal) throws IOException {
+                              @RequestParam("file") MultipartFile file,
+                              @RequestParam("galleryId") int galleryId,
+                              Principal principal) throws IOException {
 
         if (principal == null) {
             return "redirect:/login";
@@ -56,26 +59,20 @@ public class PhotoController {
         }
 
         Gallery gallery = optionalGallery.get();
-        if (gallery.getUser() == null
-                || !gallery.getUser().getUsername().equals(principal.getName())) {
+        if (gallery.getUser() == null ||
+            !gallery.getUser().getUsername().equals(principal.getName())) {
             return "redirect:/galleries";
         }
 
-        // simple local upload – same as you had
+        // upload to Cloudinary 
         if (!file.isEmpty()) {
-            String uploadDir = System.getProperty("user.dir") + File.separator + "uploads";
-            File uploadPath = new File(uploadDir);
-            if (!uploadPath.exists()) {
-                uploadPath.mkdirs();
-            }
-
-            String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-            File destinationFile = new File(uploadPath, fileName);
-            file.transferTo(destinationFile);
-            photo.setUrl("/uploads/" + fileName);
+            String imageUrl = imageUploadService.upload(file);  
+            photo.setUrl(imageUrl);
         }
 
+        // make sure the photo is linked to the gallery
         photo.setGallery(gallery);
+
         photoService.addPhoto(photo);
 
         return "redirect:/galleries/" + galleryId;
@@ -94,8 +91,8 @@ public class PhotoController {
         }
 
         Photo photo = optionalPhoto.get();
-        if (photo.getGallery().getUser() == null
-                || !photo.getGallery().getUser().getUsername().equals(principal.getName())) {
+        if (photo.getGallery().getUser() == null ||
+            !photo.getGallery().getUser().getUsername().equals(principal.getName())) {
             return "redirect:/galleries";
         }
 
@@ -107,9 +104,9 @@ public class PhotoController {
     // handle edit submit
     @PostMapping("/edit")
     public String editPhoto(@ModelAttribute Photo form,
-            @RequestParam("file") MultipartFile file,
-            @RequestParam("galleryId") int galleryId,
-            Principal principal) throws IOException {
+                            @RequestParam("file") MultipartFile file,
+                            @RequestParam("galleryId") int galleryId,
+                            Principal principal) throws IOException {
 
         if (principal == null) {
             return "redirect:/login";
@@ -123,32 +120,25 @@ public class PhotoController {
         Photo existing = optionalPhoto.get();
         Gallery gallery = existing.getGallery();
 
-        if (gallery.getUser() == null
-                || !gallery.getUser().getUsername().equals(principal.getName())) {
+        if (gallery.getUser() == null ||
+            !gallery.getUser().getUsername().equals(principal.getName())) {
             return "redirect:/galleries";
         }
 
+        // update caption text
         existing.setCaption(form.getCaption());
 
-        // replace file only if a new one is uploaded
+        // if a new file is uploaded, send it to Cloudinary
         if (!file.isEmpty()) {
-            String uploadDir = System.getProperty("user.dir") + File.separator + "uploads";
-            File uploadPath = new File(uploadDir);
-            if (!uploadPath.exists()) {
-                uploadPath.mkdirs();
-            }
-
-            String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-            File destinationFile = new File(uploadPath, fileName);
-            file.transferTo(destinationFile);
-            existing.setUrl("/uploads/" + fileName);
+            String imageUrl = imageUploadService.upload(file);
+            existing.setUrl(imageUrl);
         }
 
         photoService.updatePhoto(existing);
         return "redirect:/galleries/" + galleryId;
     }
 
-    // delete photo (GET is fine for your class)
+    // delete photo 
     @GetMapping("/delete/{photoId}")
     public String deletePhoto(@PathVariable int photoId, Principal principal) {
         Optional<Photo> optionalPhoto = photoService.getPhotoById(photoId);
@@ -178,23 +168,19 @@ public class PhotoController {
         }
     }
 
+    // view single photo
     @GetMapping("/view/{id}")
     public String viewPhoto(@PathVariable("id") int id, Model model) {
 
-        // get the optional photo from the service
         Optional<Photo> optionalPhoto = photoService.getPhotoById(id);
 
-        // if not found, just go back to all galleries
         if (optionalPhoto.isEmpty()) {
             return "redirect:/galleries/all";
         }
 
-        // unwrap the Optional so Thymeleaf gets a real Photo object
         Photo photo = optionalPhoto.get();
-
         model.addAttribute("photo", photo);
 
         return "viewphoto";
     }
-
 }

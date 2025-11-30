@@ -13,12 +13,22 @@
 
         <div class="container mt-5 text-light">
             <h2 class="text-center mb-4">Upload a Photo</h2>
-            <form th:action="@{/photos/upload}" method="post" enctype="multipart/form-data">
+
+            <form th:action="@{/photos/upload}"
+                  method="post"
+                  enctype="multipart/form-data"
+                  th:object="${photo}">
+
                 <input type="hidden" name="galleryId" th:value="${galleryId}" />
 
                 <div class="mb-3">
-                    <label for="title" class="form-label">Title</label>
-                    <input type="text" id="title" name="title" class="form-control" required />
+                    <label for="caption" class="form-label">Title / Caption</label>
+                    
+                    <input type="text"
+                           id="caption"
+                           th:field="*{caption}"
+                           class="form-control"
+                           required />
                 </div>
 
                 <div class="mb-3">
