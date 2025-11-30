@@ -17,14 +17,15 @@ public class ImageUploadService {
 
     // constructor inject keys 
     public ImageUploadService(
-            @Value("${cloudinary.cloud_name}") String cloudName,
-            @Value("${cloudinary.api_key}") String apiKey,
-            @Value("${cloudinary.api_secret}") String apiSecret) {
+            @Value("${CLOUDINARY_CLOUD_NAME}") String cloudName,
+            @Value("${CLOUDINARY_API_KEY}") String apiKey,
+            @Value("${CLOUDINARY_API_SECRET}") String apiSecret) {
 
         this.cloudinary = new Cloudinary(ObjectUtils.asMap(
                 "cloud_name", cloudName,
                 "api_key", apiKey,
-                "api_secret", apiSecret));
+                "api_secret", apiSecret
+        ));
     }
 
     // uploads and returns https url

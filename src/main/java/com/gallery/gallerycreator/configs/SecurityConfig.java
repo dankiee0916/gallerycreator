@@ -24,7 +24,7 @@ public class SecurityConfig {
         http
             .authorizeHttpRequests(auth -> auth
                 // Public access allowed for these paths
-                .requestMatchers("/", "/register", "/register/**", "/login", "/logout", "/css/**", "/images/**", "/uploads/**", "/js/**").permitAll()
+                .requestMatchers("/", "/register", "/register/**", "/login", "/logout", "/css/**", "/images/**", "galleries/all","/uploads/**", "/js/**").permitAll()
                 // All other requests require login
                 .anyRequest().authenticated()
             )

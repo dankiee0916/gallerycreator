@@ -56,8 +56,8 @@ public class PhotoController {
         }
 
         Gallery gallery = optionalGallery.get();
-        if (gallery.getUser() == null ||
-                !gallery.getUser().getUsername().equals(principal.getName())) {
+        if (gallery.getUser() == null
+                || !gallery.getUser().getUsername().equals(principal.getName())) {
             return "redirect:/galleries";
         }
 
@@ -94,8 +94,8 @@ public class PhotoController {
         }
 
         Photo photo = optionalPhoto.get();
-        if (photo.getGallery().getUser() == null ||
-                !photo.getGallery().getUser().getUsername().equals(principal.getName())) {
+        if (photo.getGallery().getUser() == null
+                || !photo.getGallery().getUser().getUsername().equals(principal.getName())) {
             return "redirect:/galleries";
         }
 
@@ -123,8 +123,8 @@ public class PhotoController {
         Photo existing = optionalPhoto.get();
         Gallery gallery = existing.getGallery();
 
-        if (gallery.getUser() == null ||
-                !gallery.getUser().getUsername().equals(principal.getName())) {
+        if (gallery.getUser() == null
+                || !gallery.getUser().getUsername().equals(principal.getName())) {
             return "redirect:/galleries";
         }
 
@@ -176,6 +176,17 @@ public class PhotoController {
         } else {
             return "redirect:/galleries";
         }
+    }
+
+    @GetMapping("/view/{id}")
+    public String viewPhoto(@PathVariable("id") int id, Model model) {
+        Optional<Photo> photo = photoService.getPhotoById(id);
+        if (photo == null) {
+            return "redirect:/galleries/all"; 
+        }
+
+        model.addAttribute("photo", photo);
+        return "viewphoto";
     }
 
 }

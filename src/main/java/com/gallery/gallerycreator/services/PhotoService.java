@@ -24,7 +24,6 @@ public class PhotoService {
     }
 
     // get one photo, with gallery + user loaded
-    @Transactional(readOnly = true)
     public Optional<Photo> getPhotoById(int id) {
         return photoRepository.findById(id);
     }
