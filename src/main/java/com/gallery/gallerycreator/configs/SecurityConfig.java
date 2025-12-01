@@ -24,8 +24,20 @@ public class SecurityConfig {
         http
             .authorizeHttpRequests(auth -> auth
                 // Public access allowed for these paths
-                .requestMatchers("/", "/register", "/register/**", "/login", "/logout", "/css/**", "/images/**", "galleries/all","/uploads/**", "/js/**").permitAll()
-                // All other requests require login
+                .requestMatchers(
+                        "/",                 // home page
+                        "/register", "/register/**",
+                        "/login", "/logout",
+                        "/css/**",
+                        "/images/**",
+                        "/js/**",
+                        "/uploads/**",       // served uploaded files
+                        "/galleries/all",    // public "View All Galleries" page
+                        "/galleries/*",      // public view of a single gallery by id
+                        "/photos/view/**",   // public view of a single photo
+                        "/error"             // Spring Boot error page
+                ).permitAll()
+                // All other requests require login 
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
@@ -37,11 +49,12 @@ public class SecurityConfig {
                 .logoutSuccessUrl("/login?logout")        // Redirect after logout
                 .permitAll()
             );
-        // CSRF is enabled by default -> add hidden token in forms
+
+        
         return http.build();
     }
 
-    // Bean to expose the authentication manager (used internally by Spring Security)
+    // Bean to expose the authentication manager
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();

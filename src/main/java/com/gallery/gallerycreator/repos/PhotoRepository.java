@@ -23,4 +23,5 @@ public interface PhotoRepository extends JpaRepository<Photo, Integer> {
     // gets the first photo for a gallery (smallest id)
     Photo findFirstByGalleryOrderByIdAsc(Gallery gallery);
 
+
 }

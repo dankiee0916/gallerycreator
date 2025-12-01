@@ -19,7 +19,7 @@ public class GalleryService {
     @Autowired
     private GalleryRepository galleryRepository;
 
-      @Autowired
+    @Autowired
     private PhotoRepository photoRepository;
 
     // list galleries for one user
@@ -52,7 +52,8 @@ public class GalleryService {
         galleryRepository.deleteById(id);
     }
 
-    // get all galleries and set a preview URL for each one
+    // get all galleries and attach previewUrl from first photo
+    @Transactional(readOnly = true)
     public List<Gallery> getAllGalleriesWithPreview() {
         List<Gallery> galleries = galleryRepository.findAll();
 
@@ -60,10 +61,9 @@ public class GalleryService {
             Photo firstPhoto = photoRepository.findFirstByGalleryOrderByIdAsc(g);
 
             if (firstPhoto != null) {
-                g.setPreviewUrl(firstPhoto.getUrl());
+                g.setPreviewUrl(firstPhoto.getUrl()); // <-- Marky's should hit this
             } else {
-                // fallback image if gallery has no photos
-                g.setPreviewUrl("/images/background.jpg");
+                g.setPreviewUrl("/images/background.jpg"); // fallback if no photos
             }
         }
 
