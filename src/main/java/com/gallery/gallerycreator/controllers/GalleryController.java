@@ -172,6 +172,7 @@ public class GalleryController {
         return "gallerylist";
     }
 
+    // show all galleries with preview images (public page)
     @GetMapping("/galleries/all")
     public String viewAllGalleries(Model model) {
         List<Gallery> galleries = galleryService.getAllGalleriesWithPreview();
