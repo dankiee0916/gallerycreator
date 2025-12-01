@@ -163,15 +163,6 @@ public class GalleryController {
         return "gallery";
     }
 
-    // show all galleries (public page)
-    @GetMapping("/all")
-    public String allGalleries(Model model) {
-        List<Gallery> all = galleryService.getAllGalleries();
-        model.addAttribute("galleries", all);
-        model.addAttribute("isMyGallery", false);
-        return "gallerylist";
-    }
-
     // show all galleries with preview images (public page)
     @GetMapping("/all")
     public String viewAllGalleries(Model model) {
