@@ -1,6 +1,7 @@
 # Gallera – Virtual Gallery Creator
 
 Live Site: https://gallerycreator.onrender.com/
+Video Overview: https://www.youtube.com/watch?v=s0eSRpWx_oQ
 
 Course: CST-451 / CST-452 Senior Capstone
 Developer: Francisco Gonzalez
