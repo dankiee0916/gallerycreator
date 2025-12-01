@@ -36,16 +36,16 @@ public class Gallery {
     @OneToMany(mappedBy = "gallery", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<Photo> photos;
 
-    @Transient
-    private String previewUrl;
+  @Transient
+private String previewUrl;
 
-    public String getPreviewUrl() {
-        return previewUrl;
-    }
+public String getPreviewUrl() {
+    return previewUrl;
+}
 
-    public void setPreviewUrl(String previewUrl) {
-        this.previewUrl = previewUrl;
-    }
+public void setPreviewUrl(String previewUrl) {
+    this.previewUrl = previewUrl;
+}
 
     public Gallery() {
     }

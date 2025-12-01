@@ -52,18 +52,21 @@ public class GalleryService {
         galleryRepository.deleteById(id);
     }
 
-    // get all galleries and attach previewUrl from first photo
-    @Transactional(readOnly = true)
+    // get all galleries and set a preview URL for each one
     public List<Gallery> getAllGalleriesWithPreview() {
         List<Gallery> galleries = galleryRepository.findAll();
 
         for (Gallery g : galleries) {
-            Photo firstPhoto = photoRepository.findFirstByGalleryOrderByIdAsc(g);
 
-            if (firstPhoto != null) {
-                g.setPreviewUrl(firstPhoto.getUrl()); // <-- Marky's should hit this
+            List<Photo> photos = photoRepository.findByGallery(g);
+
+            if (photos != null && !photos.isEmpty()) {
+                // first photo in that gallery
+                Photo firstPhoto = photos.get(0);
+                g.setPreviewUrl(firstPhoto.getUrl());
             } else {
-                g.setPreviewUrl("/images/background.jpg"); // fallback if no photos
+                // fallback image if gallery has no photos
+                g.setPreviewUrl("/images/background.jpg");
             }
         }
 

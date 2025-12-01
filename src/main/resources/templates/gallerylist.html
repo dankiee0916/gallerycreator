@@ -44,11 +44,8 @@
                             <img th:if="${gallery.previewUrl != null}" th:src="${gallery.previewUrl}" alt="Preview"
                                 class="me-3" style="width: 90px; height: 60px; object-fit: cover; border-radius: 5px;">
 
-                            <img th:if="${gallery.previewUrl == null}" src="/images/background.jpg" alt="Preview"
+                            <img th:if="${gallery.previewUrl == null}" th:src="@{/images/background.jpg}" alt="Preview"
                                 class="me-3" style="width: 90px; height: 60px; object-fit: cover; border-radius: 5px;">
-
-
-
 
                             <!-- Text -->
                             <div>
