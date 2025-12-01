@@ -1,0 +1,31 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/27.0.9 Chrome/134.0.6998.205 Electron/35.4.0 Safari/537.36" version="27.0.9">
+  <diagram name="Page-1" id="KSNwCxQXBOtNvMbqJtjw">
+    <mxGraphModel dx="1410" dy="825" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="VxI48CnCS3c-PkqRMU0U-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="VxI48CnCS3c-PkqRMU0U-1" target="VxI48CnCS3c-PkqRMU0U-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="VxI48CnCS3c-PkqRMU0U-1" value="User Browser&lt;div&gt;(Chrome / Edge)&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="365" y="40" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="VxI48CnCS3c-PkqRMU0U-2" value="Gallera Web App&lt;div&gt;Spring Boot + ThymeLeaf&lt;/div&gt;&lt;div&gt;Spring Security&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="348" y="150" width="155" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="VxI48CnCS3c-PkqRMU0U-4" value="Database&lt;div&gt;PostgreSQL&lt;/div&gt;&lt;div&gt;Neon Cloud DB&lt;/div&gt;" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" vertex="1" parent="1">
+          <mxGeometry x="378" y="260" width="95" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="VxI48CnCS3c-PkqRMU0U-5" value="Image Storage&lt;div&gt;Uploads folder / Exernal Host&lt;/div&gt;" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" vertex="1" parent="1">
+          <mxGeometry x="344" y="420" width="162" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="VxI48CnCS3c-PkqRMU0U-7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="VxI48CnCS3c-PkqRMU0U-2" target="VxI48CnCS3c-PkqRMU0U-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="VxI48CnCS3c-PkqRMU0U-8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="VxI48CnCS3c-PkqRMU0U-4" target="VxI48CnCS3c-PkqRMU0U-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
